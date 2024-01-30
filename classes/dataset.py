@@ -61,3 +61,34 @@ class SimpleDynamicDataset(Dataset):
         X[idx] = torch.zeros(1, 4, dtype=torch.float)
 
         return X, idx, y
+
+
+
+class DynamicConvertDataset(Dataset):
+    def __init__(self, X, y):
+        '''
+        Convert the binary data to floats dynamically.
+
+        Args:
+        - X: shape (n, 243), input data, with cells to remove, number
+        are stored in binary to help the model make binary operations hopefully.
+        - idx: shape (n, 50), list of possible cells to remove.
+        - y: shape (n, 81), dense target data for cross-entropy loss.
+        '''
+
+        self.X = X
+        self.idx = idx
+        self.y = y
+
+    def __len__(self):
+        return len(self.idx)
+
+    def __getitem__(self, i):
+
+        idx = self.idx[i, 0].to(torch.long)
+        y = self.y[i, idx].to(torch.long)
+
+        X = self.X[i].to(torch.float)
+        X[idx] = torch.zeros(1, 4, dtype=torch.float)
+
+        return X, idx, y
